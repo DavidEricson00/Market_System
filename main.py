@@ -2,6 +2,9 @@ import client
 import admin
 import os
 
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 def header():
     print('-------------------------')
     print('     Market System       ')
@@ -15,21 +18,28 @@ def main_menu():
 
 def main():
     option = 0
-    header()
     while option != 3:
+        header()
         main_menu()
-        option = int(input('Select the desired option: '))
+        try:
+            option = int(input('Select the desired option: '))
+        except ValueError:
+            clear_screen()
+            print('Invalid input, please enter a number.')
+            continue
+        
         if option == 1:
-            os.system('cls')
+            clear_screen()
             client.main()
         elif option == 2:
-            os.system('cls')
+            clear_screen()
             admin.main()
         elif option == 3:
-            pass
+            clear_screen()
+            print('Exiting the Market System...')
         else:
-            os.system('cls')
+            clear_screen()
             print('Invalid option')
-            header()
-
-main()
+            
+if __name__ == "__main__":
+    main()
