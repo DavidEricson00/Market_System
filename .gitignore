@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Banco de dados
+products.db
+
+# Ambiente virtual (se houver)
+venv/
+.env/
+
+# Configurações de IDE (VSCode, por exemplo)
+.vscode/
