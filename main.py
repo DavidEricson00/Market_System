@@ -1,15 +1,7 @@
 import client
 import admin
 import db
-import os
-
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-def header():
-    print('-------------------------')
-    print('     Market System       ')
-    print('-------------------------')
+from utils import clear_screen, header
 
 def main_menu():
     print('Select an option:')

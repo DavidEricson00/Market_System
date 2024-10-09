@@ -1,27 +1,33 @@
 import getpass
-import os
+from utils import clear_screen, header
 import db
 
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+def find_product_by_id(product_id):
+    return db.execute_query('SELECT * FROM products WHERE id = ?', (product_id,))
 
-def login_authentication(loginx, passwordx):
-    return loginx == "Admin" and passwordx == "0000"
+def login_authentication(username, password):
+    return username == "Admin" and password == "0000"
 
 def add_product():
-    name = input('Enter product name: ')
-    price = float(input('Enter product price: '))
-    quantity = int(input('Enter product quantity: '))
+    try:
+        name = input('Enter product name: ').strip()
+        price = float(input('Enter product price: '))
+        quantity = int(input('Enter product quantity: '))
 
-    print(f'{name} with the price {price} and quantity {quantity}')
-    print('Are you sure you want to add this product to the system?')
-    confirm = input('[Y/N]: ').strip().lower()
+        if not name or price < 0 or quantity < 0:
+            print("Invalid product data. Please try again.")
+            return
 
-    if confirm == 'y':
-        db.execute_commit('INSERT INTO products (name, price, quantity) VALUES (?, ?, ?)', (name, price, quantity))
-        print('Product added successfully!')
-    else:
-        print('Product was not added to the database.')
+        print(f'{name} with the price {price} and quantity {quantity}')
+        confirm = input('Are you sure you want to add this product to the system? [Y/N]: ').strip().lower()
+
+        if confirm == 'y':
+            db.execute_commit('INSERT INTO products (name, price, quantity) VALUES (?, ?, ?)', (name, price, quantity))
+            print('Product added successfully!')
+        else:
+            print('Product was not added to the database.')
+    except ValueError:
+        print('Invalid input. Please enter valid numbers for price and quantity.')
 
 def list_products():
     products = db.execute_query('SELECT * FROM products')
@@ -35,54 +41,52 @@ def list_products():
         print('No products found.')
 
 def update_product():
-    id = int(input('Enter the product ID to update: '))
+    try:
+        product_id = int(input('Enter the product ID to update: '))
+        product = find_product_by_id(product_id)
 
-    product = db.execute_query('SELECT * FROM products WHERE id = ?', (id,))
-    
-    if product:
-        product = product[0]
-        name, price, quantity = product[1], product[2], product[3]
+        if product:
+            product = product[0]
+            name, price, quantity = product[1], product[2], product[3]
 
-        print('Current product information:')
-        print(f'Product: {name} with the price {price:.2f} and quantity {quantity}')
+            print(f'Current product: {name}, Price: {price:.2f}, Quantity: {quantity}')
 
-        name = input('Enter the new product name: ')
-        price = float(input('Enter the new product price: '))
-        quantity = int(input('Enter the new product quantity: '))
+            new_name = input(f'Enter new name (current: {name}): ').strip() or name
+            new_price = float(input(f'Enter new price (current: {price}): ') or price)
+            new_quantity = int(input(f'Enter new quantity (current: {quantity}): ') or quantity)
 
-        print(f'Product: {name} with the price {price} and quantity {quantity}')
-        print('Are you sure you want to update this product?')
-        confirm = input('[Y/N]: ').strip().lower()
-
-        if confirm == 'y':
-            db.execute_commit('UPDATE products SET name = ?, price = ?, quantity = ? WHERE id = ?', (name, price, quantity, id))
-            print('Product updated successfully!')
+            if new_name and new_price >= 0 and new_quantity >= 0:
+                db.execute_commit('UPDATE products SET name = ?, price = ?, quantity = ? WHERE id = ?', 
+                                  (new_name, new_price, new_quantity, product_id))
+                print('Product updated successfully!')
+            else:
+                print('Invalid product data.')
         else:
-            print('Product was not updated.')
-    else:
-        print('Product not found.')
+            print('Product not found.')
+    except ValueError:
+        print('Invalid input. Please enter valid numbers.')
 
 def remove_product():
-    id = int(input('Enter the product ID to remove: '))
-    
-    product = db.execute_query('SELECT * FROM products WHERE id = ?', (id,))
-    
-    if product:
-        product = product[0]
-        name, price, quantity = product[1], product[2], product[3]
-        
-        print(f'Product: {name} with the price {price:.2f} and quantity {quantity}')
-        print('Are you sure you want to remove this product?')
-        confirm = input('[Y/N]: ').strip().lower()
+    try:
+        product_id = int(input('Enter the product ID to remove: '))
+        product = find_product_by_id(product_id)
 
-        if confirm == 'y':
-            db.execute_commit('DELETE FROM products WHERE id = ?', (id,))
-            print('Product removed successfully!')
+        if product:
+            product = product[0]
+            name, price, quantity = product[1], product[2], product[3]
+            
+            print(f'Product: {name} with the price {price:.2f} and quantity {quantity}')
+            confirm = input('Are you sure you want to remove this product? [Y/N]: ').strip().lower()
+
+            if confirm == 'y':
+                db.execute_commit('DELETE FROM products WHERE id = ?', (product_id,))
+                print('Product removed successfully!')
+            else:
+                print('Product was not removed.')
         else:
-            print('Product was not removed.')
-    else:
-        print('Product not found.')
-
+            print('Product not found.')
+    except ValueError:
+        print('Invalid input. Please enter a valid product ID.')
 
 def menu():
     print('1. Add Product')
@@ -92,46 +96,34 @@ def menu():
     print('5. Clear Screen')
     print('6. Exit')
 
-def admheader():
-    print('------------------------------------')
-    print('   Welcome to the Admin Interface   ')
-    print('------------------------------------')
-
-def header():
-    print('------------------------------------')
-
 def admin_interface():
     option = 0
     while option != 6:
-        admheader()
+        header('Admin Interface')
         menu()
         try:
             option = int(input('Select the desired option: '))
+            clear_screen()
+
+            if option == 1:
+                add_product()
+            elif option == 2:
+                list_products()
+            elif option == 3:
+                list_products()
+                update_product()
+            elif option == 4:
+                list_products()
+                remove_product()
+            elif option == 5:
+                clear_screen()
+            elif option == 6:
+                print('Exiting the Admin Interface...')
+            else:
+                print('Invalid option.')
         except ValueError:
             clear_screen()
             print('Invalid input. Please enter a number.')
-            continue
-
-        if option == 1:
-            clear_screen()
-            add_product()
-        elif option == 2:
-            clear_screen()
-            list_products()
-        elif option == 3:
-            clear_screen()
-            update_product()
-        elif option == 4:
-            clear_screen()
-            remove_product()
-        elif option == 5:
-            clear_screen()
-        elif option == 6:
-            clear_screen()
-            print('Exiting the Admin Interface...')
-        else:
-            clear_screen()
-            print('Invalid option.')
 
 def main():
     login = input('Enter login: ')
@@ -141,7 +133,7 @@ def main():
         clear_screen()
         admin_interface()
     else:
-        header()
         print('Access denied. Please try again.')
-        header()
-        main()
+
+if __name__ == "__main__":
+    main()
