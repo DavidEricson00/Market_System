@@ -54,8 +54,16 @@
 
 <h2>📥 Getting Started</h2>
 <p>
-    Clone this repository and run the main script to start using the Market System.
+    To start using the Market System, follow these steps:
 </p>
+<ol>
+    <li>Clone the repository:</li>
+    <pre><code>git clone https://github.com/DavidEricson00/Market_System.git</code></pre>
+    <li>Navigate to the project directory:</li>
+    <pre><code>cd Market_System</code></pre>
+    <li>Run the main script:</li>
+    <pre><code>python main.py</code></pre>
+</ol>
 
 </body>
 </html>
