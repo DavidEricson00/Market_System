@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
 <h1 align="center">🛒 Market System</h1>
 
 <h2>📌 Objectives</h2>
@@ -64,6 +57,3 @@
     <li>Run the main script:</li>
     <pre><code>python main.py</code></pre>
 </ol>
-
-</body>
-</html>
